@@ -1,77 +1,229 @@
-import pygtk
-pygtk.require('2.0')
-import gtk
+import sys, os
+try:
+    import gi
 
-class TreeViewColumnExample(object):
+    gi.require_version("Gtk", "3.0")
+    # from gi.repository import Gtk,GdkPixbuf,GObject,Pango,Gdk
+    from gi.repository import Gtk
+except:
+    pass
 
-    # close the window and quit
-    def delete_event(self, widget, event, data=None):
-        gtk.main_quit()
-        return False
+from minipowerpc import MiniPC
+
+class GUI(object):
 
     def __init__(self):
-        # Create a new window
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        self.window.set_title("TreeViewColumn Example")
-        self.window.connect("delete_event", self.delete_event)
+        self.pc = MiniPC()
+        #GObject.threads_init()
+        self.gladefile = "minipowerpc.glade"
+        self.gladefile_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "res", self.gladefile)
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file(self.gladefile_path)
+        self.builder.connect_signals(self)
+        self.window = self.builder.get_object("mppc_gui")
+        #prog view
+        self.progview = self.builder.get_object("treeview_prog")
 
-        # create a liststore with one string column to use as the model
-        self.liststore = gtk.ListStore(str, str, str, 'gboolean')
+        self.cell_prog_num = Gtk.CellRendererText()
+        self.col_prog_num = Gtk.TreeViewColumn("pos", self.cell_prog_num, text=0)
+        self.progview.append_column(self.col_prog_num)
 
-        # create the TreeView using liststore
-        self.treeview = gtk.TreeView(self.liststore)
+        self.cell_prog_bin = Gtk.CellRendererText()
+        self.col_prog_bin = Gtk.TreeViewColumn("bin", self.cell_prog_bin, text=1)
+        self.progview.append_column(self.col_prog_bin)
 
-        # create the TreeViewColumns to display the data
-        self.tvcolumn = gtk.TreeViewColumn('Pixbuf and Text')
-        self.tvcolumn1 = gtk.TreeViewColumn('Text Only')
+        self.cell_prog_code = Gtk.CellRendererText()
+        self.col_prog_code = Gtk.TreeViewColumn("decompiled", self.cell_prog_code, text=2)
+        self.progview.append_column(self.col_prog_code)
 
-        # add a row with text and a stock item - color strings for
-        # the background
-        self.liststore.append(['Open', gtk.STOCK_OPEN, 'Open a File', True])
-        self.liststore.append(['New', gtk.STOCK_NEW, 'New File', True])
-        self.liststore.append(['Print', gtk.STOCK_PRINT, 'Print File', False])
+        self.cell_prog_int = Gtk.CellRendererText()
+        self.col_prog_int = Gtk.TreeViewColumn("int value", self.cell_prog_int, text=3)
+        self.progview.append_column(self.col_prog_int)
 
-        # add columns to treeview
-        self.treeview.append_column(self.tvcolumn)
-        self.treeview.append_column(self.tvcolumn1)
-
-        # create a CellRenderers to render the data
-        self.cellpb = gtk.CellRendererPixbuf()
-        self.cell = gtk.CellRendererText()
-        self.cell1 = gtk.CellRendererText()
-
-        # set background color property
-        self.cellpb.set_property('cell-background', 'yellow')
-        self.cell.set_property('cell-background', 'cyan')
-        self.cell1.set_property('cell-background', 'pink')
+        self.cell_prog_hex = Gtk.CellRendererText()
+        self.col_prog_hex = Gtk.TreeViewColumn("hex value", self.cell_prog_hex, text=4)
+        self.progview.append_column(self.col_prog_hex)
 
 
-        # add the cells to the columns - 2 in the first
-        self.tvcolumn.pack_start(self.cellpb, False)
-        self.tvcolumn.pack_start(self.cell, True)
-        self.tvcolumn1.pack_start(self.cell1, True)
+        #mem view
+        self.memview = self.builder.get_object("treeview_mem")
 
-        self.tvcolumn.set_attributes(self.cellpb, stock_id=1)
-        self.tvcolumn.set_attributes(self.cell, text=0)
-        self.tvcolumn1.set_attributes(self.cell1, text=2,
-                                      cell_background_set=3)
+        self.cell_mem_num = Gtk.CellRendererText()
+        self.col_mem_num = Gtk.TreeViewColumn("pos", self.cell_mem_num, text=0)
+        self.memview.append_column(self.col_mem_num)
 
-        # make treeview searchable
-        self.treeview.set_search_column(0)
+        self.cell_mem_bin = Gtk.CellRendererText()
+        self.col_mem_bin = Gtk.TreeViewColumn("bin", self.cell_mem_bin, text=1)
+        self.memview.append_column(self.col_mem_bin)
 
-        # Allow sorting on the column
-        self.tvcolumn.set_sort_column_id(0)
+        self.cell_mem_int = Gtk.CellRendererText()
+        self.col_mem_int = Gtk.TreeViewColumn("int value", self.cell_mem_int, text=2)
+        self.memview.append_column(self.col_mem_int)
 
-        # Allow drag and drop reordering of rows
-        self.treeview.set_reorderable(True)
+        self.cell_mem_hex = Gtk.CellRendererText()
+        self.col_mem_hex = Gtk.TreeViewColumn("hex value", self.cell_mem_hex, text=3)
+        self.memview.append_column(self.col_mem_hex)
 
-        self.window.add(self.treeview)
+        self.txt_steps = self.builder.get_object("txt_steps")
+        self.txt_mempos = self.builder.get_object("txt_mempos")
+        self.txt_jumps = self.builder.get_object("txt_jumps")
+        self.txt_runtime_real = self.builder.get_object("txt_runtime_real")
 
-        self.window.show_all()
+        self.img_accu_curry = self.builder.get_object("img_accu_curry")
+        self.txt_accu_bin = self.builder.get_object("txt_accu_bin")
+        self.txt_accu_int = self.builder.get_object("txt_accu_int")
+        self.txt_accu_hex = self.builder.get_object("txt_accu_hex")
 
-def main():
-    gtk.main()
+        self.txt_reg1_bin = self.builder.get_object("txt_reg1_bin")
+        self.txt_reg1_int = self.builder.get_object("txt_reg1_int")
+        self.txt_reg1_hex = self.builder.get_object("txt_reg1_hex")
 
-if __name__ == "__main__":
-    tvcexample = TreeViewColumnExample()
-    main()
+        self.txt_reg2_bin = self.builder.get_object("txt_reg2_bin")
+        self.txt_reg2_int = self.builder.get_object("txt_reg2_int")
+        self.txt_reg2_hex = self.builder.get_object("txt_reg2_hex")
+
+        self.txt_reg3_bin = self.builder.get_object("txt_reg3_bin")
+        self.txt_reg3_int = self.builder.get_object("txt_reg3_int")
+        self.txt_reg3_hex = self.builder.get_object("txt_reg3_hex")
+
+        self.init_gui()
+
+        self.window.show()
+
+        Gtk.main()
+
+        self.loaded = False
+
+    #helper methods
+    def load(self, file):
+        print "loading file: ".format(file)
+        self.pc.cpu.mem.load(file)
+        self.pc.cpu.init()
+        self.init_gui()
+
+    def init_gui(self):
+        #setup models
+
+        self.memstore = Gtk.ListStore(int, str, int, str)
+        self.memview.set_model(self.memstore)
+        self.progstore = Gtk.ListStore(int, str, str, int, str)
+        self.progview.set_model(self.progstore)
+
+        i = 100
+        while True:
+            opcode = self.pc.cpu.mem.get(i)
+            line = i
+            as_bin = opcode.bin
+            op = self.pc.cpu.get_operation(opcode)
+            if op:
+                decom = op.decompile(opcode)
+            else:
+                decom = "END"
+            as_int = opcode.int
+            as_hex = opcode.hex
+            self.progstore.append([line, as_bin, decom, as_int, as_hex])
+            if opcode == self.pc.cpu.END:
+                break
+            i += 2
+
+        i = 500
+        while True:
+            opcode = self.pc.cpu.mem.get(i)
+            line = i
+            as_bin = opcode.bin
+            as_int = opcode.int
+            as_hex = opcode.hex
+            self.memstore.append([line, as_bin, as_int, as_hex])
+            if opcode == self.pc.cpu.END:
+                break
+            i += 2
+
+        self.selection = self.progview.get_selection()
+
+        self.update_gui()
+
+    def update_gui(self):
+        self.txt_steps.set_text(str(self.pc.cpu.steps))
+        self.txt_mempos.set_text(str(self.pc.cpu.mem.real.bytepos))
+        self.txt_jumps.set_text(str(self.pc.cpu.mem.jumps))
+        self.txt_runtime_real.set_text(str(self.pc.cpu.exec_time_real))
+
+        if self.pc.cpu.accu.curry:
+            self.img_accu_curry.set_from_stock(Gtk.STOCK_YES, Gtk.IconSize.BUTTON)
+        else:
+            self.img_accu_curry.set_from_stock(Gtk.STOCK_NO, Gtk.IconSize.BUTTON)
+        self.txt_accu_bin.set_text(self.pc.cpu.accu.val.bin)
+        self.txt_accu_int.set_text("%i"%self.pc.cpu.accu.val.int)
+        self.txt_accu_hex.set_text(self.pc.cpu.accu.val.hex)
+
+        self.txt_reg1_bin.set_text(self.pc.cpu.registers['01'].val.bin)
+        self.txt_reg1_int.set_text("%i"%self.pc.cpu.registers['01'].val.int)
+        self.txt_reg1_hex.set_text(self.pc.cpu.registers['01'].val.hex)
+
+        self.txt_reg2_bin.set_text(self.pc.cpu.registers['10'].val.bin)
+        self.txt_reg2_int.set_text("%i"%self.pc.cpu.registers['10'].val.int)
+        self.txt_reg2_hex.set_text(self.pc.cpu.registers['10'].val.hex)
+
+        self.txt_reg3_bin.set_text(self.pc.cpu.registers['11'].val.bin)
+        self.txt_reg3_int.set_text("%i"%self.pc.cpu.registers['11'].val.int)
+        self.txt_reg3_hex.set_text(self.pc.cpu.registers['11'].val.hex)
+
+        self.selection.select_path("{}".format((self.pc.cpu.mem.pos-100)/2))
+
+    # event handlers
+    def delete_event(self, event, data=None):
+        Gtk.main_quit()
+        return False
+
+    def on_compile_event(self, event, data=None):
+        dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
+          Gtk.FileChooserAction.OPEN,
+          (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+           Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+        #self.add_filters(dialog)
+        response = dialog.run()
+        filename = False
+        if response == Gtk.ResponseType.OK:
+            print "Open clicked"
+            print "File selected: " + dialog.get_filename()
+            filename = dialog.get_filename()
+        elif response == Gtk.ResponseType.CANCEL:
+            print "Cancel clicked"
+
+        dialog.destroy()
+        if filename:
+            compiled_file = self.pc.compiler.compile(filename)
+            self.load(compiled_file)
+
+    def on_open_event(self, event, data=None):
+        dialog = Gtk.FileChooserDialog("Please choose a file", self.window,
+                                       Gtk.FileChooserAction.OPEN,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+        #self.add_filters(dialog)
+
+        response = dialog.run()
+        filename = False
+        if response == Gtk.ResponseType.OK:
+            print "Open clicked"
+            print "File selected: " + dialog.get_filename()
+            filename = dialog.get_filename()
+        elif response == Gtk.ResponseType.CANCEL:
+            print "Cancel clicked"
+
+        dialog.destroy()
+
+        if filename:
+            self.load(filename)
+
+    def on_run_event(self, event, data=None):
+        pass
+
+    def on_slow_event(self, event, data=None):
+        pass
+
+    def on_step_event(self, event, data=None):
+        self.pc.cpu.step()
+        self.update_gui()

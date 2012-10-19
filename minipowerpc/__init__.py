@@ -11,6 +11,7 @@ class Register(object):
 class Mem(object):
     def __init__(self):
         self.real = BitStream(600*16)
+        self.jumps = 0
 
     def load(self, file):
         self.real = BitStream(filename=file)
@@ -19,10 +20,19 @@ class Mem(object):
         self.real.tofile(file)
 
     def jump(self, pos):
+        self.jumps += 1
         self.real.bytepos = pos
 
     def read(self, size=16):
         return self.real.read(16)
+
+    def get(self, pos, size=16):
+        realpos = pos * 8
+        return self.real[realpos:realpos+size]
+
+    @property
+    def pos(self):
+        return self.real.bytepos
 
 
 class CPU(object):
@@ -33,6 +43,7 @@ class CPU(object):
         self.debug = False
         self.mem = Mem()
         self.mem.jump(100)
+        self.exec_time_real = 0
         self.steps = 0
         self._ended = False
         self.reg_ids = [BitArray('0b00'), BitArray('0b01'), BitArray('0b10'), BitArray('0b11')]
@@ -62,6 +73,11 @@ class CPU(object):
                                                                                 self._opcodeprefixes[prefix])
                 return self._opcodeprefixes[prefix]
 
+    def init(self):
+        self._ended = False
+        self.mem.jump(100)
+        self.exec_time_real = 0
+
     def step(self):
         if not self.end:
             op = self.mem.read()
@@ -73,7 +89,6 @@ class CPU(object):
 
 
     def run(self):
-        self.mem.jump(100)
         while not self.end:
             self.step()
 
@@ -158,6 +173,9 @@ class BaseOperation(object):
 
     def __init__(self, pc):
         self.pc = pc
+
+    def decompile(self, opcode):
+        return self.__class__.__name__
 
 class NumBaseOperation(BaseOperation):
     num_length=10
