@@ -50,22 +50,22 @@ class SRA(BaseOperation):
     opcodeprefix = Bits('0b00000101')
 
     def do(self, op):
-        self.pc.accu.curry = self.pc.accu.val[len(op)-1]
-        self.pc.accu.val = self.pc.accu.val.int >> 1
+        self.pc.cpu.accu.curry = self.pc.cpu.accu.val[len(op)-1]
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val.int >> 1
 
 class SLA(BaseOperation):
     opcodeprefix = Bits('0b00001000')
 
     def do(self, op):
-        self.pc.accu.curry = self.pc.accu.val[1]
-        self.pc.accu.val = self.pc.accu.val.int << 1
+        self.pc.cpu.accu.curry = self.pc.cpu.accu.val[1]
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val.int << 1
 
 class SRL(BaseOperation):
     opcodeprefix = Bits('0b00001001')
 
-    def du(self, op):
-        self.pc.accu.curry = self.pc.accu.val[len(op)-1]
-        self.pc.accu.val = self.pc.accu.val >> 1
+    def do(self, op):
+        self.pc.cpu.accu.curry = self.pc.cpu.accu.val[len(op)-1]
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val >> 1
 
 class SLL(BaseOperation):
     opcodeprefix = Bits('0b00001100')
