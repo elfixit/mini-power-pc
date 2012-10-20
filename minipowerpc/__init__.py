@@ -30,6 +30,10 @@ class Mem(object):
         realpos = pos * 8
         return self.real[realpos:realpos+size]
 
+    def set(self, pos, bits):
+        realpos = pos * 8
+        self.real[realpos:realpos+len(bits)] = bits
+
     @property
     def pos(self):
         return self.real.bytepos

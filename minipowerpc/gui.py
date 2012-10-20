@@ -1,4 +1,5 @@
 import sys, os
+from bitstring import Bits, BitArray, BitStream
 try:
     import gi
 
@@ -53,15 +54,27 @@ class GUI(object):
         self.memview.append_column(self.col_mem_num)
 
         self.cell_mem_bin = Gtk.CellRendererText()
+        self.cell_mem_bin.set_property("editable", True)
+        self.cell_mem_bin.connect("edited", self.mem_edited_bin)
         self.col_mem_bin = Gtk.TreeViewColumn("bin", self.cell_mem_bin, text=1)
         self.memview.append_column(self.col_mem_bin)
 
         self.cell_mem_int = Gtk.CellRendererText()
+        self.cell_mem_int.set_property("editable", True)
+        self.cell_mem_int.connect("edited", self.mem_edited_int)
         self.col_mem_int = Gtk.TreeViewColumn("int value", self.cell_mem_int, text=2)
         self.memview.append_column(self.col_mem_int)
 
+        self.cell_mem_uint = Gtk.CellRendererText()
+        self.cell_mem_uint.set_property("editable", True)
+        self.cell_mem_uint.connect("edited", self.mem_edited_uint)
+        self.col_mem_uint = Gtk.TreeViewColumn("uint value", self.cell_mem_uint, text=3)
+        self.memview.append_column(self.col_mem_uint)
+
         self.cell_mem_hex = Gtk.CellRendererText()
-        self.col_mem_hex = Gtk.TreeViewColumn("hex value", self.cell_mem_hex, text=3)
+        self.cell_mem_hex.set_property("editable", True)
+        self.cell_mem_hex.connect("edited", self.mem_edited_hex)
+        self.col_mem_hex = Gtk.TreeViewColumn("hex value", self.cell_mem_hex, text=4)
         self.memview.append_column(self.col_mem_hex)
 
         self.txt_steps = self.builder.get_object("txt_steps")
@@ -104,7 +117,7 @@ class GUI(object):
     def init_gui(self):
         #setup models
 
-        self.memstore = Gtk.ListStore(int, str, int, str)
+        self.memstore = Gtk.ListStore(int, str, int, int, str)
         self.memview.set_model(self.memstore)
         self.progstore = Gtk.ListStore(int, str, str, int, str)
         self.progview.set_model(self.progstore)
@@ -132,8 +145,9 @@ class GUI(object):
             line = i
             as_bin = opcode.bin
             as_int = opcode.int
+            as_uint = opcode.uint
             as_hex = opcode.hex
-            self.memstore.append([line, as_bin, as_int, as_hex])
+            self.memstore.append([line, as_bin, as_int, as_uint, as_hex])
             if opcode == self.pc.cpu.END:
                 break
             i += 2
@@ -223,6 +237,42 @@ class GUI(object):
 
     def on_slow_event(self, event, data=None):
         pass
+
+    def mem_edited_bin(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray(bin=data)
+        pos = int(element[0])
+        self.update_mem(pos, bitdata, path)
+
+    def mem_edited_int(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray(int=int(data), length=16)
+        pos = int(element[0])
+        self.update_mem(pos, bitdata, path)
+
+    def mem_edited_uint(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray(uint=int(data), length=16)
+        pos = int(element[0])
+        self.update_mem(pos, bitdata, path)
+
+    def mem_edited_hex(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray("0x%s"%data)
+        pos = int(element[0])
+        self.update_mem(pos, bitdata, path)
+
+    def update_mem(self, pos, bitdata, path):
+        self.pc.cpu.mem.set(pos, bitdata)
+        self.memstore[path][1] = bitdata.bin
+        self.memstore[path][2] = bitdata.int
+        self.memstore[path][3] = bitdata.uint
+        self.memstore[path][4] = bitdata.hex
+        if len(self.memstore) == int(path) + 1:
+            new_bits = Bits(bin='0000000000000000')
+            self.memstore.append([pos+2, new_bits.bin, new_bits.int, new_bits.uint, new_bits.hex])
+
+
 
     def on_step_event(self, event, data=None):
         self.pc.cpu.step()
