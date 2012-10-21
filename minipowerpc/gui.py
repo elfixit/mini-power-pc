@@ -269,7 +269,7 @@ class GUI(object):
 
     def edited_mem(self, pos, bitdata, path):
         self.pc.cpu.mem.set(pos, bitdata)
-        self.update_mem()t
+        self.update_mem()
 
     def on_step_event(self, event, data=None):
         self.pc.cpu.step()
