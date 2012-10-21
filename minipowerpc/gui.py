@@ -187,8 +187,9 @@ class GUI(object):
             self.memstore.append([line, as_bin, as_int, as_uint, as_hex])
             if opcode == self.pc.cpu.END:
                 break
-            i += 2# event handlers
+            i += 2
 
+    # event handlers
     def delete_event(self, event, data=None):
         Gtk.main_quit()
         return False
@@ -268,13 +269,7 @@ class GUI(object):
 
     def edited_mem(self, pos, bitdata, path):
         self.pc.cpu.mem.set(pos, bitdata)
-        self.memstore[path][1] = bitdata.bin
-        self.memstore[path][2] = bitdata.int
-        self.memstore[path][3] = bitdata.uint
-        self.memstore[path][4] = bitdata.hex
-        if len(self.memstore) == int(path) + 1:
-            new_bits = Bits(bin='0000000000000000')
-            self.memstore.append([pos+2, new_bits.bin, new_bits.int, new_bits.uint, new_bits.hex])
+        self.update_mem()t
 
     def on_step_event(self, event, data=None):
         self.pc.cpu.step()
