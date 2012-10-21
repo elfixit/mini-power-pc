@@ -232,5 +232,4 @@ class NumRegisterBaseOperation(RegisterBaseOperation):
         compiled[len_start+len(reg):len_start+len(reg)+len_end] = cls.opcodeprefix[1]
         compiled[6:16] = get_reference(args[1], length=cls.num_length, format=cls.num_format)
         return compiled
-#def bin(s):
-#    return str(s) if s <= 1 else bin(s >> 1) + str(s & 1)
+
