@@ -139,19 +139,6 @@ class GUI(object):
                 break
             i += 2
 
-        i = 500
-        while True:
-            opcode = self.pc.cpu.mem.get(i)
-            line = i
-            as_bin = opcode.bin
-            as_int = opcode.int
-            as_uint = opcode.uint
-            as_hex = opcode.hex
-            self.memstore.append([line, as_bin, as_int, as_uint, as_hex])
-            if opcode == self.pc.cpu.END:
-                break
-            i += 2
-
         self.selection = self.progview.get_selection()
 
         self.update_gui()
@@ -184,7 +171,24 @@ class GUI(object):
 
         self.selection.select_path("{}".format((self.pc.cpu.mem.pos-100)/2))
 
-    # event handlers
+        self.update_mem()
+
+    def update_mem(self):
+        for element in self.memstore:
+            self.memstore.remove(element.iter)
+        i = 500
+        while True:
+            opcode = self.pc.cpu.mem.get(i)
+            line = i
+            as_bin = opcode.bin
+            as_int = opcode.int
+            as_uint = opcode.uint
+            as_hex = opcode.hex
+            self.memstore.append([line, as_bin, as_int, as_uint, as_hex])
+            if opcode == self.pc.cpu.END:
+                break
+            i += 2# event handlers
+
     def delete_event(self, event, data=None):
         Gtk.main_quit()
         return False
@@ -242,27 +246,27 @@ class GUI(object):
         element = self.memstore[path]
         bitdata = BitArray(bin=data)
         pos = int(element[0])
-        self.update_mem(pos, bitdata, path)
+        self.edited_mem(pos, bitdata, path)
 
     def mem_edited_int(self, event, path, data=None):
         element = self.memstore[path]
         bitdata = BitArray(int=int(data), length=16)
         pos = int(element[0])
-        self.update_mem(pos, bitdata, path)
+        self.edited_mem(pos, bitdata, path)
 
     def mem_edited_uint(self, event, path, data=None):
         element = self.memstore[path]
         bitdata = BitArray(uint=int(data), length=16)
         pos = int(element[0])
-        self.update_mem(pos, bitdata, path)
+        self.edited_mem(pos, bitdata, path)
 
     def mem_edited_hex(self, event, path, data=None):
         element = self.memstore[path]
         bitdata = BitArray("0x%s"%data)
         pos = int(element[0])
-        self.update_mem(pos, bitdata, path)
+        self.edited_mem(pos, bitdata, path)
 
-    def update_mem(self, pos, bitdata, path):
+    def edited_mem(self, pos, bitdata, path):
         self.pc.cpu.mem.set(pos, bitdata)
         self.memstore[path][1] = bitdata.bin
         self.memstore[path][2] = bitdata.int
@@ -271,8 +275,6 @@ class GUI(object):
         if len(self.memstore) == int(path) + 1:
             new_bits = Bits(bin='0000000000000000')
             self.memstore.append([pos+2, new_bits.bin, new_bits.int, new_bits.uint, new_bits.hex])
-
-
 
     def on_step_event(self, event, data=None):
         self.pc.cpu.step()

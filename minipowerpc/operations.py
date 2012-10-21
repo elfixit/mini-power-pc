@@ -11,6 +11,20 @@ class CLR(RegisterBaseOperation):
 class ADD(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0000'), Bits('0b111'))
 
+    def do(self, op):
+        regval = self.register.val.int
+        accuval = self.pc.cpu.accu.val.int
+        newval = regval + accuval
+        try:
+            newaccu = Bits(int=newval, length=16)
+        except CreationError:
+            newlength = len(bin(newaccu))
+            newaccu = Bits(int=newval, length=newlength)
+            self.pc.cpu.accu.curry = True
+            self.pc.cpu.accu.val = newaccu[len(accuval) - 16:]
+        else:
+            self.pc.cpu.accu.val = newaccu
+
 class ADDD(NumBaseOperation):
     num_length = 15
     num_format = 'int'
@@ -41,10 +55,18 @@ class LWDD(NumRegisterBaseOperation):
     num_format = 'uint'
     opcodeprefix = (Bits('0b0100'), Bits())
 
+    def do(self, op):
+        pos = op[6:16].uint
+        self.register.val = self.pc.cpu.mem.get(pos)
+
 class SWDD(NumRegisterBaseOperation):
     num_length = 10
     num_format = 'uint'
     opcodeprefix = (Bits('0b0110'), Bits())
+
+    def do(self, op):
+        pos = op[6:16].uint
+        self.pc.cpu.mem.set(pos, self.register.val)
 
 class SRA(BaseOperation):
     opcodeprefix = Bits('0b00000101')
