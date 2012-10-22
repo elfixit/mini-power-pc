@@ -141,6 +141,8 @@ class GUI(object):
 
         self.selection = self.progview.get_selection()
 
+        self.selection.connect("changed", self.jump_selected)
+
         self.update_gui()
 
     def update_gui(self):
@@ -264,6 +266,14 @@ class GUI(object):
     def edited_mem(self, pos, bitdata, path):
         self.pc.cpu.mem.set(pos, bitdata)
         self.update_mem()
+
+    def jump_selected(self, event, data=None):
+        model, treeiter = self.selection.get_selected()
+        if treeiter != None:
+            pos = int(model[treeiter][0])
+            if pos != self.pc.cpu.mem.pos:
+                self.pc.cpu.mem.jump(pos)
+                self.update_gui()
 
     def on_step_event(self, event, data=None):
         self.pc.cpu.step()
