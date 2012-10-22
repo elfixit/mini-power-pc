@@ -23,8 +23,22 @@
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="progstore">
+    <columns>
+      <!-- column-name first -->
+      <column type="gchararray"/>
+      <!-- column-name secound -->
+      <column type="gchararray"/>
+      <!-- column-name decompiled -->
+      <column type="gchararray"/>
+      <!-- column-name intval -->
+      <column type="gint"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="mppc_gui">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Mini Power PC</property>
+    <property name="icon_name">application-x-executable</property>
     <signal name="destroy" handler="delete_event" swapped="no"/>
     <child>
       <object class="GtkBox" id="box1">
@@ -261,6 +275,7 @@
                 <property name="label" translatable="yes">run</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-media-play</property>
+                <signal name="clicked" handler="on_run_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -471,7 +486,7 @@
                       <packing>
                         <property name="left_attach">0</property>
                         <property name="top_attach">1</property>
-                        <property name="width">1</property>
+                        <property name="width">2</property>
                         <property name="height">1</property>
                       </packing>
                     </child>
@@ -514,9 +529,6 @@
                         <property name="width">1</property>
                         <property name="height">1</property>
                       </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
                     </child>
                   </object>
                   <packing>
@@ -570,7 +582,7 @@
                       <packing>
                         <property name="left_attach">0</property>
                         <property name="top_attach">1</property>
-                        <property name="width">1</property>
+                        <property name="width">2</property>
                         <property name="height">1</property>
                       </packing>
                     </child>
@@ -617,10 +629,17 @@
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
+                      <object class="GtkImage" id="image2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="stock">gtk-remove</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">0</property>
+                        <property name="width">1</property>
+                        <property name="height">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -673,7 +692,7 @@
                       <packing>
                         <property name="left_attach">0</property>
                         <property name="top_attach">1</property>
-                        <property name="width">1</property>
+                        <property name="width">2</property>
                         <property name="height">1</property>
                       </packing>
                     </child>
@@ -720,10 +739,17 @@
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
+                      <object class="GtkImage" id="image3">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="stock">gtk-remove</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">0</property>
+                        <property name="width">1</property>
+                        <property name="height">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -776,7 +802,7 @@
                       <packing>
                         <property name="left_attach">0</property>
                         <property name="top_attach">1</property>
-                        <property name="width">1</property>
+                        <property name="width">2</property>
                         <property name="height">1</property>
                       </packing>
                     </child>
@@ -823,10 +849,17 @@
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
+                      <object class="GtkImage" id="image4">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="stock">gtk-remove</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">0</property>
+                        <property name="width">1</property>
+                        <property name="height">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -1027,17 +1060,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkListStore" id="progstore">
-    <columns>
-      <!-- column-name first -->
-      <column type="gchararray"/>
-      <!-- column-name secound -->
-      <column type="gchararray"/>
-      <!-- column-name decompiled -->
-      <column type="gchararray"/>
-      <!-- column-name intval -->
-      <column type="gint"/>
-    </columns>
   </object>
 </interface>
