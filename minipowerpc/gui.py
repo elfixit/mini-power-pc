@@ -276,5 +276,6 @@ class GUI(object):
             GObject.timeout_add(500, self.on_slow_event)
 
     def on_run_event(self, event, data=None):
-       pass
+        self.pc.cpu.run()
+        self.update_gui()
 
