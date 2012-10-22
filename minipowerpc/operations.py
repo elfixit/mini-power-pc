@@ -109,6 +109,10 @@ class NOT(BaseOperation):
 class BZ(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b10'))
 
+    def do(self, op):
+        if self.pc.cpu.accu.val.int == 0:
+            self.pc.cpu.mem.jump(self.register.val.uint)
+
 class BNZ(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b01'))
 

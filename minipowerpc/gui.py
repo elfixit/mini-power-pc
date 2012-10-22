@@ -5,7 +5,7 @@ try:
 
     gi.require_version("Gtk", "3.0")
     # from gi.repository import Gtk,GdkPixbuf,GObject,Pango,Gdk
-    from gi.repository import Gtk
+    from gi.repository import Gtk, GObject
 except:
     pass
 
@@ -237,12 +237,6 @@ class GUI(object):
         if filename:
             self.load(filename)
 
-    def on_run_event(self, event, data=None):
-        pass
-
-    def on_slow_event(self, event, data=None):
-        pass
-
     def mem_edited_bin(self, event, path, data=None):
         element = self.memstore[path]
         bitdata = BitArray(bin=data)
@@ -274,3 +268,13 @@ class GUI(object):
     def on_step_event(self, event, data=None):
         self.pc.cpu.step()
         self.update_gui()
+
+    def on_slow_event(self, event=None, data=None):
+        if not self.pc.cpu.end:
+            self.pc.cpu.step()
+            self.update_gui()
+            GObject.timeout_add(500, self.on_slow_event)
+
+    def on_run_event(self, event, data=None):
+       pass
+
