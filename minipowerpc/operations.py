@@ -116,28 +116,49 @@ class BZ(RegisterBaseOperation):
 class BNZ(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b01'))
 
+    def do(self, op):
+        pass
+
 class BC(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b11'))
 
+    def do(self, op):
+       pass
+
 class B(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b00'))
+
+    def do(self, op):
+        pass
 
 class BZD(NumBaseOperation):
     num_length = 10
     num_format = 'uint'
     opcodeprefix = Bits('0b001100')
 
+    def do(self, op):
+       pass
+
 class BNZD(NumBaseOperation):
     num_length = 10
     num_format = 'uint'
     opcodeprefix = Bits('0b001010')
+
+    def do(self, op):
+        pass
 
 class BCD(NumBaseOperation):
     num_length = 10
     num_format = 'uint'
     opcodeprefix = Bits('0b001110')
 
+    def do(self, op):
+        pass
+
 class BD(NumBaseOperation):
     num_length = 10
     num_format = 'uint'
     opcodeprefix = Bits('0b001000')
+
+    def do(self, op):
+        pass
