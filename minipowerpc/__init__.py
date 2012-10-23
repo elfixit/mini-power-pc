@@ -1,6 +1,6 @@
 import inspect
 import copy
-from bitstring import BitArray, BitStream
+from bitstring import Bits, BitArray, BitStream
 from minipowerpc.utils import get_reference, get_number
 
 class Register(object):
@@ -113,13 +113,16 @@ class Compiler(object):
         opcode_all = BitArray(100*8)
         for line in mnemonicstr.splitlines():
             elements = line.split()
-            cls = self._mnemonics[elements.pop(0)]
-            opcode = cls.compile(*elements)
-            if self.debug:
-                print "compiled line: {} to: {}".format(line, opcode.bin)
-            if not len(opcode) == 16:
-                    raise Exception("Invalid opcode compiling.. {}")
-            opcode_all.append(opcode)
+            if not len(elements) == 0 and not line.startswith(';'):
+                cls = self._mnemonics[elements.pop(0)]
+                opcode = cls.compile(*elements)
+                if self.debug:
+                    print "compiled line: {} to: {}".format(line, opcode.bin)
+                if not len(opcode) == 16:
+                        raise Exception("Invalid opcode compiling.. {}")
+                opcode_all.append(opcode)
+            else:
+                opcode_all.append(Bits(16))
         opcode_final = BitArray(600*8)
         opcode_final[0:len(opcode_all)] = opcode_all
         return opcode_final
