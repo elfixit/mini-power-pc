@@ -30,6 +30,10 @@ class Mem(object):
         realpos = pos * 8
         return self.real[realpos:realpos+size]
 
+    def set(self, pos, bits):
+        realpos = pos * 8
+        self.real[realpos:realpos+len(bits)] = bits
+
     @property
     def pos(self):
         return self.real.bytepos
@@ -216,6 +220,7 @@ class RegisterBaseOperation(BaseOperation):
         super(RegisterBaseOperation, self).__init__(pc)
 
 class NumRegisterBaseOperation(RegisterBaseOperation):
+    @classmethod
     def compile(cls, *args):
         len_start = len(cls.opcodeprefix[0])
         len_end = len(cls.opcodeprefix[1])
@@ -223,9 +228,8 @@ class NumRegisterBaseOperation(RegisterBaseOperation):
         reg = BitArray(bin=args[0])
         compiled = BitArray(16)
         compiled[0:len_start] = cls.opcodeprefix[0]
-        compiled[len_start:len_start+len(reg)] = get_reference(args[1], length=cls.num_length, format=cls.num_format)
+        compiled[len_start:len_start+len(reg)] = reg
         compiled[len_start+len(reg):len_start+len(reg)+len_end] = cls.opcodeprefix[1]
-        compiled[6:16] = num
+        compiled[6:16] = get_reference(args[1], length=cls.num_length, format=cls.num_format)
         return compiled
-#def bin(s):
-#    return str(s) if s <= 1 else bin(s >> 1) + str(s & 1)
+

@@ -1,10 +1,11 @@
 import sys, os
+from bitstring import Bits, BitArray, BitStream
 try:
     import gi
 
     gi.require_version("Gtk", "3.0")
     # from gi.repository import Gtk,GdkPixbuf,GObject,Pango,Gdk
-    from gi.repository import Gtk
+    from gi.repository import Gtk, GObject
 except:
     pass
 
@@ -53,15 +54,27 @@ class GUI(object):
         self.memview.append_column(self.col_mem_num)
 
         self.cell_mem_bin = Gtk.CellRendererText()
+        self.cell_mem_bin.set_property("editable", True)
+        self.cell_mem_bin.connect("edited", self.mem_edited_bin)
         self.col_mem_bin = Gtk.TreeViewColumn("bin", self.cell_mem_bin, text=1)
         self.memview.append_column(self.col_mem_bin)
 
         self.cell_mem_int = Gtk.CellRendererText()
+        self.cell_mem_int.set_property("editable", True)
+        self.cell_mem_int.connect("edited", self.mem_edited_int)
         self.col_mem_int = Gtk.TreeViewColumn("int value", self.cell_mem_int, text=2)
         self.memview.append_column(self.col_mem_int)
 
+        self.cell_mem_uint = Gtk.CellRendererText()
+        self.cell_mem_uint.set_property("editable", True)
+        self.cell_mem_uint.connect("edited", self.mem_edited_uint)
+        self.col_mem_uint = Gtk.TreeViewColumn("uint value", self.cell_mem_uint, text=3)
+        self.memview.append_column(self.col_mem_uint)
+
         self.cell_mem_hex = Gtk.CellRendererText()
-        self.col_mem_hex = Gtk.TreeViewColumn("hex value", self.cell_mem_hex, text=3)
+        self.cell_mem_hex.set_property("editable", True)
+        self.cell_mem_hex.connect("edited", self.mem_edited_hex)
+        self.col_mem_hex = Gtk.TreeViewColumn("hex value", self.cell_mem_hex, text=4)
         self.memview.append_column(self.col_mem_hex)
 
         self.txt_steps = self.builder.get_object("txt_steps")
@@ -104,7 +117,7 @@ class GUI(object):
     def init_gui(self):
         #setup models
 
-        self.memstore = Gtk.ListStore(int, str, int, str)
+        self.memstore = Gtk.ListStore(int, str, int, int, str)
         self.memview.set_model(self.memstore)
         self.progstore = Gtk.ListStore(int, str, str, int, str)
         self.progview.set_model(self.progstore)
@@ -126,19 +139,9 @@ class GUI(object):
                 break
             i += 2
 
-        i = 500
-        while True:
-            opcode = self.pc.cpu.mem.get(i)
-            line = i
-            as_bin = opcode.bin
-            as_int = opcode.int
-            as_hex = opcode.hex
-            self.memstore.append([line, as_bin, as_int, as_hex])
-            if opcode == self.pc.cpu.END:
-                break
-            i += 2
-
         self.selection = self.progview.get_selection()
+
+        self.selection.connect("changed", self.jump_selected)
 
         self.update_gui()
 
@@ -169,6 +172,24 @@ class GUI(object):
         self.txt_reg3_hex.set_text(self.pc.cpu.registers['11'].val.hex)
 
         self.selection.select_path("{}".format((self.pc.cpu.mem.pos-100)/2))
+
+        self.update_mem()
+
+    def update_mem(self):
+        for element in self.memstore:
+            self.memstore.remove(element.iter)
+        i = 500
+        while True:
+            opcode = self.pc.cpu.mem.get(i)
+            line = i
+            as_bin = opcode.bin
+            as_int = opcode.int
+            as_uint = opcode.uint
+            as_hex = opcode.hex
+            self.memstore.append([line, as_bin, as_int, as_uint, as_hex])
+            if opcode == self.pc.cpu.END:
+                break
+            i += 2
 
     # event handlers
     def delete_event(self, event, data=None):
@@ -218,12 +239,53 @@ class GUI(object):
         if filename:
             self.load(filename)
 
-    def on_run_event(self, event, data=None):
-        pass
+    def mem_edited_bin(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray(bin=data)
+        pos = int(element[0])
+        self.edited_mem(pos, bitdata, path)
 
-    def on_slow_event(self, event, data=None):
-        pass
+    def mem_edited_int(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray(int=int(data), length=16)
+        pos = int(element[0])
+        self.edited_mem(pos, bitdata, path)
+
+    def mem_edited_uint(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray(uint=int(data), length=16)
+        pos = int(element[0])
+        self.edited_mem(pos, bitdata, path)
+
+    def mem_edited_hex(self, event, path, data=None):
+        element = self.memstore[path]
+        bitdata = BitArray("0x%s"%data)
+        pos = int(element[0])
+        self.edited_mem(pos, bitdata, path)
+
+    def edited_mem(self, pos, bitdata, path):
+        self.pc.cpu.mem.set(pos, bitdata)
+        self.update_mem()
+
+    def jump_selected(self, event, data=None):
+        model, treeiter = self.selection.get_selected()
+        if treeiter != None:
+            pos = int(model[treeiter][0])
+            if pos != self.pc.cpu.mem.pos:
+                self.pc.cpu.mem.jump(pos)
+                self.update_gui()
 
     def on_step_event(self, event, data=None):
         self.pc.cpu.step()
         self.update_gui()
+
+    def on_slow_event(self, event=None, data=None):
+        if not self.pc.cpu.end:
+            self.pc.cpu.step()
+            self.update_gui()
+            GObject.timeout_add(500, self.on_slow_event)
+
+    def on_run_event(self, event, data=None):
+        self.pc.cpu.run()
+        self.update_gui()
+

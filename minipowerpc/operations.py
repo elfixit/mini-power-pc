@@ -1,6 +1,6 @@
 from bitstring import Bits, BitArray, CreationError
 from minipowerpc import BaseOperation, NumBaseOperation, RegisterBaseOperation, NumRegisterBaseOperation
-
+from minipowerpc.utils import set_newval
 class CLR(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0000'), Bits('0b101'))
 
@@ -11,6 +11,12 @@ class CLR(RegisterBaseOperation):
 class ADD(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0000'), Bits('0b111'))
 
+    def do(self, op):
+        regval = self.register.val.int
+        accuval = self.pc.cpu.accu.val.int
+        newval = regval + accuval
+        set_newval(self.pc, newval)
+
 class ADDD(NumBaseOperation):
     num_length = 15
     num_format = 'int'
@@ -20,45 +26,53 @@ class ADDD(NumBaseOperation):
         opval = opcode[1:len(opcode)].int
         accuval = self.pc.cpu.registers['00'].val.int
         newaccu = accuval + opval
-        try:
-            accuop = Bits(int=newaccu, length=16)
-        except CreationError:
-            new_length = len(bin(newaccu))
-            accuop = Bits(int=newaccu, length=new_length)
-            self.pc.cpu.accu.curry = True
-            self.pc.cpu.accu.val = accuop[len(accuop) - 16:]
-        else:
-            self.pc.cpu.accu.val = accuop
+        set_newval(self.pc, newaccu)
 
 class INC(BaseOperation):
     opcodeprefix = Bits('0b00000001')
 
+    def do(self, opcode):
+        newaccu = self.pc.cpu.accu.val.int + 1
+        set_newval(self.pc, newaccu)
+
 class DEC(BaseOperation):
     opcodeprefix = Bits('0b00000100')
+
+    def do(self, opcode):
+        newaccu = self.pc.cpu.accu.val.int - 1
+        set_newval(self.pc, newaccu)
 
 class LWDD(NumRegisterBaseOperation):
     num_length = 10
     num_format = 'uint'
     opcodeprefix = (Bits('0b0100'), Bits())
 
+    def do(self, op):
+        pos = op[6:16].uint
+        self.register.val = self.pc.cpu.mem.get(pos)
+
 class SWDD(NumRegisterBaseOperation):
     num_length = 10
     num_format = 'uint'
     opcodeprefix = (Bits('0b0110'), Bits())
+
+    def do(self, op):
+        pos = op[6:16].uint
+        self.pc.cpu.mem.set(pos, self.register.val)
 
 class SRA(BaseOperation):
     opcodeprefix = Bits('0b00000101')
 
     def do(self, op):
         self.pc.cpu.accu.curry = self.pc.cpu.accu.val[len(op)-1]
-        self.pc.cpu.accu.val = self.pc.cpu.accu.val.int >> 1
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val >> 1
 
 class SLA(BaseOperation):
     opcodeprefix = Bits('0b00001000')
 
     def do(self, op):
         self.pc.cpu.accu.curry = self.pc.cpu.accu.val[1]
-        self.pc.cpu.accu.val = self.pc.cpu.accu.val.int << 1
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val << 1
 
 class SRL(BaseOperation):
     opcodeprefix = Bits('0b00001001')
@@ -94,6 +108,10 @@ class NOT(BaseOperation):
 
 class BZ(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b10'))
+
+    def do(self, op):
+        if self.pc.cpu.accu.val.int == 0:
+            self.pc.cpu.mem.jump(self.register.val.uint)
 
 class BNZ(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b01'))
