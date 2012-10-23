@@ -5,15 +5,15 @@ def get_number(num_str, length=15, format="int"):
 
 def get_reference(num_str, length=10, format="uint"):
     if num_str.startswith('C') or num_str.startswith('c'):
-        num_str.replace('C', '')
-        num_str.replace('c', '')
+        num_str = num_str.replace('C', '')
+        num_str = num_str.replace('c', '')
         num_str = str((int(num_str)-1)*2+100)
     elif num_str.startswith('M') or num_str.startswith('m'):
-        num_str.replace('M', '')
-        num_str.replace('m', '')
+        num_str = num_str.replace('M', '')
+        num_str = num_str.replace('m', '')
         num_str = str((int(num_str)-1)*2+500)
     elif num_str.startswith('#'):
-        num_str.replace('#', '')
+        num_str = num_str.replace('#', '')
     return get_number(num_str, length, format)
 
 from bitstring import CreationError
