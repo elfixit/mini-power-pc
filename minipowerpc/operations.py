@@ -117,19 +117,21 @@ class BNZ(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b01'))
 
     def do(self, op):
-        pass
+        if not self.pc.cpu.accu.val.int == 0:
+            self.pc.cpu.mem.jump(self.register.val.uint)
 
 class BC(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b11'))
 
     def do(self, op):
-       pass
+        if self.pc.cpu.accu.curry:
+            self.pc.cpu.mem.jump(self.register.val.uint)
 
 class B(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b00'))
 
     def do(self, op):
-        pass
+        self.pc.cpu.mem.jump(self.register.val.uint)
 
 class BZD(NumBaseOperation):
     num_length = 10
@@ -137,7 +139,10 @@ class BZD(NumBaseOperation):
     opcodeprefix = Bits('0b001100')
 
     def do(self, op):
-       pass
+       if self.pc.cpu.accu.val.int == 0:
+           start = len(op) - self.num_length
+           num = getattr(op, num_format, 0)
+           self.pc.cpu.mem.jump(num)
 
 class BNZD(NumBaseOperation):
     num_length = 10
@@ -145,7 +150,10 @@ class BNZD(NumBaseOperation):
     opcodeprefix = Bits('0b001010')
 
     def do(self, op):
-        pass
+        if not self.pc.cpu.accu.val.int == 0:
+            start = len(op) - self.num_length
+            num = getattr(op[start:len(op)], num_format, 0)
+            self.pc.cpu.mem.jump(num)
 
 class BCD(NumBaseOperation):
     num_length = 10
@@ -153,7 +161,11 @@ class BCD(NumBaseOperation):
     opcodeprefix = Bits('0b001110')
 
     def do(self, op):
-        pass
+        if self.pc.cpu.accu.curry:
+            start = len(op) - self.num_length
+            num = getattr(op[start:len(op)], num_format, 0)
+            self.pc.cpu.mem.jump(num)
+
 
 class BD(NumBaseOperation):
     num_length = 10
@@ -161,4 +173,7 @@ class BD(NumBaseOperation):
     opcodeprefix = Bits('0b001000')
 
     def do(self, op):
-        pass
+        start = len(op) - self.num_length
+        num = getattr(op[start:len(op)], num_format, 0)
+        self.pc.cpu.mem.jump(num)
+
