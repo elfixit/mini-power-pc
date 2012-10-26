@@ -141,7 +141,7 @@ class BZD(NumBaseOperation):
     def do(self, op):
        if self.pc.cpu.accu.val.int == 0:
            start = len(op) - self.num_length
-           num = getattr(op, num_format, 0)
+           num = getattr(op, self.num_format, 0)
            self.pc.cpu.mem.jump(num)
 
 class BNZD(NumBaseOperation):
@@ -152,7 +152,7 @@ class BNZD(NumBaseOperation):
     def do(self, op):
         if not self.pc.cpu.accu.val.int == 0:
             start = len(op) - self.num_length
-            num = getattr(op[start:len(op)], num_format, 0)
+            num = getattr(op[start:len(op)], self.num_format, 0)
             self.pc.cpu.mem.jump(num)
 
 class BCD(NumBaseOperation):
@@ -163,7 +163,7 @@ class BCD(NumBaseOperation):
     def do(self, op):
         if self.pc.cpu.accu.curry:
             start = len(op) - self.num_length
-            num = getattr(op[start:len(op)], num_format, 0)
+            num = getattr(op[start:len(op)], self.num_format, 0)
             self.pc.cpu.mem.jump(num)
 
 
@@ -174,6 +174,6 @@ class BD(NumBaseOperation):
 
     def do(self, op):
         start = len(op) - self.num_length
-        num = getattr(op[start:len(op)], num_format, 0)
+        num = getattr(op[start:len(op)], self.num_format, 0)
         self.pc.cpu.mem.jump(num)
 
