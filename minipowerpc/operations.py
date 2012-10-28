@@ -65,14 +65,16 @@ class SRA(BaseOperation):
 
     def do(self, op):
         self.pc.cpu.accu.curry = self.pc.cpu.accu.val[len(op)-1]
-        self.pc.cpu.accu.val = self.pc.cpu.accu.val >> 1
+        self.pc.cpu.accu.val = BitArray(self.pc.cpu.accu.val)
+        self.pc.cpu.accu.val[1:len(op)] = self.pc.cpu.accu.val[1:len(op)] >> 1
 
 class SLA(BaseOperation):
     opcodeprefix = Bits('0b00001000')
 
     def do(self, op):
         self.pc.cpu.accu.curry = self.pc.cpu.accu.val[1]
-        self.pc.cpu.accu.val = self.pc.cpu.accu.val << 1
+        self.pc.cpu.accu.val = BitArray(self.cpu.accu.val)
+        self.pc.cpu.accu.val[1:len(op)] = self.pc.cpu.accu.val[1:len(op)] << 1
 
 class SRL(BaseOperation):
     opcodeprefix = Bits('0b00001001')
