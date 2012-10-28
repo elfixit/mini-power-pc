@@ -112,8 +112,9 @@ class Compiler(object):
     def compile_str(self, mnemonicstr):
         opcode_all = BitArray(100*8)
         for line in mnemonicstr.splitlines():
-            elements = line.split()
-            if not len(elements) == 0 and not line.startswith(';'):
+            realline = line.split(';')
+            elements = realline[0].split()
+            if not len(elements) == 0:
                 cls = self._mnemonics[elements.pop(0)]
                 opcode = cls.compile(*elements)
                 if self.debug:
@@ -122,7 +123,7 @@ class Compiler(object):
                         raise Exception("Invalid opcode compiling.. {}")
                 opcode_all.append(opcode)
             else:
-                opcode_all.append(Bits(16))
+                opcode_all.append(Bits(bin='1'+Bits(15).bin))
         opcode_final = BitArray(600*8)
         opcode_final[0:len(opcode_all)] = opcode_all
         return opcode_final
