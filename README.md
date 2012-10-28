@@ -1,4 +1,6 @@
 mini-power-pc
 =============
 
-Mini Power PC compiler and CPU emulator..
+YASSP - Yet another stupid school project
+
+Mini Power PC compiler and CPU emulator
