@@ -1,0 +1,92 @@
+CLR 00 ; Andrew Donald Booth Multiplication
+CLR 00 ; 	input vars:
+CLR 00 ; #500 Multiplayer
+CLR 00 ; #502 Multiplicant
+CLR 00 ; 	output var:
+CLR 00 ; #504 Q16 	more significant 16 bit
+CLR 00 ; #506 Q		less significant 16 bit
+CLR 00 ; 	internal vars:
+CLR 00 ; #508 Q-1
+CLR 00 ; #510 counter 
+CLR 00 ; 
+CLR 00 ;	methods:
+CLR 00 ; #0 start 
+CLR 00 ;
+CLR 00 ; #20 compare(Q,Q-1) [Shift, Q0=1, Q16+M, Q16-M]
+CLR 00 ; #30 Q0=1(Q-1) [Q16-M, Shift]
+CLR 00 ; #40 Q16-M(Q16, M) [Shift]
+CLR 00 ; #50 Q16+M(Q16, M) [Shift]
+CLR 00 ;	
+CLR 00 ; #60 Shift(Q,Q-1,Q16) [ShiftOneToQ, Q-1==0, Q-1==0, count]
+CLR 00 ; #70 ShiftOneToQ
+CLR 00 ; #80 Q-1==0(Q-1) [count]
+CLR 00 ; #90 Q-1==1(Q-1) [count]
+CLR 00 ; 
+CLR 00 ; #100	count(counter) [END,compare]
+CLR 00 					; L150
+CLR 00 					; L152
+ADDD 154 				; L154
+CLR 00 					; L156
+CLR 00 					; L158
+CLR 00 					; L160
+CLR 00 					; L162
+CLR 00 					; L164
+CLR 00 					; L166
+CLR 00 					; L168
+CLR 00 					; L170
+CLR 00 					; L172
+CLR 00 					; L174
+CLR 00 					; L176
+CLR 00 					; L178
+CLR 00 					; L180
+CLR 00 					; L182
+CLR 00 					; L184
+CLR 00 					; L186
+CLR 00 					; L188
+CLR 00 					; L190
+CLR 00 					; L192
+CLR 00 					; L194
+CLR 00 					; L196
+CLR 00 					; L198
+CLR 00 					; L200
+CLR 00 					; L202
+CLR 00 					; L204
+CLR 00 					; L206
+CLR 00 					; L208
+CLR 00 					; L210
+CLR 00 					; L212
+CLR 00 					; L214
+CLR 00 					; L216
+CLR 00 					; L218
+CLR 00 					; L220
+CLR 00 					; L222
+CLR 00 					; L224
+CLR 00 					; L226
+CLR 00 					; L228
+CLR 00 					; L230
+CLR 00 					; L232
+CLR 00 					; L234
+CLR 00 					; L236
+CLR 00 					; L238
+CLR 00 					; L240
+CLR 00 					; L242
+CLR 00 					; L244
+CLR 00 					; L246
+CLR 00 					; L248
+CLR 00 					; L250
+CLR 00 					; L252
+CLR 00 					; L254
+CLR 00 					; L256
+CLR 00 					; L258
+CLR 00 					; L260
+CLR 00 					; L262
+CLR 00 					; L264
+CLR 00 					; L266
+CLR 00 					; L268
+CLR 00 					; L270
+CLR 00 					; L272
+CLR 00 					; L274
+CLR 00 					; L276
+CLR 00 					; L278
+CLR 00 					; L280
+CLR 00 					; L282

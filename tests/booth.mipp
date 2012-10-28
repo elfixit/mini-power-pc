@@ -1,0 +1,226 @@
+CLR 00 ; Andrew Donald Booth Multiplication
+BD 160 ; 	input vars:
+CLR 00 ; #500 Multiplayer
+CLR 00 ; #502 Multiplicant
+CLR 00 ; 	output var:
+CLR 00 ; #504 Q16 	more significant 16 bit
+CLR 00 ; #506 Q		less significant 16 bit
+CLR 00 ; 	internal vars:
+CLR 00 ; #508 Q-1
+CLR 00 ; #510 counter 
+CLR 00 ; 
+CLR 00 ;	methods:
+CLR 00 ; #160 start 
+CLR 00 ;
+CLR 00 ; #200 compare(Q,Q-1) [Shift, Q0=1, Q16+M, Q16-M]
+CLR 00 ; #224 Q0=1(Q-1) [Q16-M, Shift]
+CLR 00 ; #240 Q16-M(Q16, M) [Shift]
+CLR 00 ; #270 Q16+M(Q16, M) [Shift]
+CLR 00 ;	
+CLR 00 ; #290 Shift(Q,Q-1,Q16) [ShiftOneToQ, Q-1==0, Q-1==0, count]
+CLR 00 ; #326 ShiftOneToQ
+CLR 00 ; #350 Q-1==0(Q-1) [count]
+CLR 00 ; #360 Q-1==1(Q-1) [count]
+CLR 00 ; 
+CLR 00 ; #380	count(counter) [END,compare]
+CLR 00 					; L150
+CLR 00 					; L152
+CLR 00	 				; L154
+CLR 00 					; L156
+CLR 00 					; L158
+CLR 01 					; L160 START, R01(Q16) = 0
+CLR 10 					; L162 R10 = 0
+LWDD 10 500			; L164 Multiplayer = Q -> R10
+SWDD 10 506			; L166 R10(Q) -> 506
+CLR 11					; L168 R11(Q-1)=0
+INC							; L170
+SWDD 00 510			; L172 set counter to 1
+BD 200					; L174 Jump to compare
+CLR 00 					; L176
+CLR 00 					; L178
+CLR 00 					; L180
+CLR 00 					; L182
+CLR 00 					; L184
+CLR 00 					; L186
+CLR 00 					; L188
+CLR 00 					; L190
+CLR 00 					; L192
+CLR 00 					; L194
+CLR 00 					; L196
+CLR 00 					; L198
+CLR 00					; L200 Start Compare
+CLR 10					; L202
+LWDD 10 506     ; L204 Q -> R10
+ADD 10 					; L206 R10(Q) -> R00
+SRL		 					; L208
+BCD 224					; L210 if C==1 jump to Q0=1
+CLR 00 					; L212 Q0=0
+OR 11 					; L214 0 OR Q-1
+BZD 290  				; L216 Q-1==0 -> jump to Shift
+BD 270					; L218 if Q-1==1 jump to Q16+M
+CLR 00 					; L220
+CLR 00 					; L222
+CLR 00 					; L224 Start Q0=1
+OR 11 					; L226 0 OR R11
+BNZD 290 				; L228 if Q-1==1 -> jump to Shift
+BD 240 					; L230 if Q-1==0 -> jump to Q16-M
+CLR 00 					; L232
+CLR 00 					; L234
+CLR 00 					; L236
+CLR 00 					; L238
+CLR 00 					; L240 Start Q16-M
+ADD 01					; L242 Q16 -> R00
+NOT		 					; L244 
+INC		 					; L246 Q16 * -1
+CLR 10					; L248
+LWDD 10 502 		; L250 Load M to R10
+ADD 10					; L252 -Q16 + M = RES
+NOT		 					; L254
+INC		 					; L256 RES * -1
+SWDD 00 504			; L258 RES -> Q16
+LWDD 01 504			; L260 Q16 -> R01
+BD 290 					; L262 Q16-M done, jump to Shift
+CLR 00 					; L264
+CLR 00 					; L266
+CLR 00 					; L268
+CLR 00 					; L270 START Q16+M
+ADD 01 					; L272 Q16 -> R00
+CLR 10					; L274 
+LWDD 10 502 		; L276 Load M to R10
+ADD 10					; L278 Q16 + M = RES
+SWDD 00 504			; L280 R00(RES) -> Q16
+LWDD 01 504			; L282 Q16 -> R01
+BD 290 					; L284 Q16+M done, jump to Shift
+CLR 00 					; L286
+CLR 00 					; L288
+CLR 00 					; L290 START Shift
+CLR 10 					; L292
+LWDD 10 506			; L294 Q -> R10
+ADD 01 					; L296 Q16 -> R00
+SRA		 					; L298
+SWDD 00 504			; L300 R00 -> Q16
+LWDD 01 504 		; L302 Q16 -> R01
+BCD 326					; L304 if C==1 jump to ShiftOneToQ
+CLR 00 					; L306
+ADD 10 					; L308 R10(Q) -> R00
+SRL		 					; L310
+SWDD 00 506			; L312 R00 -> Q
+BCD	360					; L314 if C==1 jump to Q-1=1 
+BD 350 					; L316 else jump to Q-1=0
+CLR 00 					; L318
+CLR 00 					; L320
+CLR 00 					; L322
+CLR 00 					; L324 
+CLR 00 					; L326 START ShiftOneToQ
+ADD 10					; L328 R10(Q) -> R00         
+NOT 						; L330
+SRL							; L332
+NOT							; L334
+SWDD 00 506			; L336 R00 -> Q
+BCD 350 				; L338 if inverseC==1 jump to Q-1=0
+BD 360 					; L340 else jump to Q-1=1
+CLR 00					; L342
+CLR	00					; L344
+CLR 00 					; L346
+CLR 00 					; L350 START Q-1=0
+SWDD 00 508 		; L352 R00(0) -> Q-1
+LWDD 11 508			; L354 Q-1 -> R11
+BD 380 					; L356 jump to count
+CLR 00 					; L358
+CLR 00 					; L360 START Q-1=1
+INC		 					; L362 R00++		
+SWDD 00 508 		; L364 R00(1) -> Q-1
+LWDD 11 508 		; L366 Q-1 -> R11
+BD 380 					; L348 jump to count
+CLR 00 					; L368
+CLR 00 					; L370
+CLR 00 					; L372
+CLR 00 					; L374
+CLR 00 					; L376
+CLR 00 					; L378
+CLR 00 					; L380 START Count
+NOT		 					; L382
+SRL		 					; L384
+NOT		 					; L386 R00 = 1000000...00
+CLR 10 					; L388
+LWDD 10 510			; L390 counter -> R10
+OR 10 					; L392 R00 = 100..010..00
+SLL							; L394 R00 = 000..100..00
+BZD 444					; L396 if counter == 0 jump to END
+SWDD 00 510			; L398 else R00 -> counter
+BD 200 					; L400 jump to compare
+CLR 00 					; L402
+CLR 00 					; L404
+CLR 00 					; L406
+CLR 00 					; L408
+CLR 00 					; L410
+CLR 00 					; L412
+CLR 00 					; L414
+CLR 00 					; L416
+CLR 00 					; L418
+CLR 00 					; L420
+CLR 00 					; L422
+CLR 00 					; L424
+CLR 00 					; L426
+CLR 00 					; L428
+CLR 00 					; L430
+CLR 00 					; L432
+CLR 00 					; L434
+CLR 00 					; L436
+CLR 00 					; L438
+CLR 00 					; L440
+CLR 00 					; L442
+
+CLR 00 					; L446
+CLR 00 					; L448
+CLR 00 					; L450
+CLR 00 					; L452
+CLR 00 					; L454
+CLR 00 					; L456
+CLR 00 					; L458
+CLR 00 					; L460
+CLR 00 					; L462
+CLR 00 					; L464
+CLR 00 					; L466
+CLR 00 					; L468
+CLR 00 					; L470
+CLR 00 					; L472
+CLR 00 					; L474
+CLR 00 					; L476
+CLR 00 					; L478
+CLR 00 					; L480
+CLR 00 					; L482
+CLR 00 					; L484
+CLR 00 					; L486
+CLR 00 					; L488
+CLR 00 					; L490
+CLR 00 					; L492
+CLR 00 					; L494
+CLR 00 					; L496
+CLR 00 					; L498
+CLR 00					; L500
+CLR 00 					; L502
+CLR 00 					; L504
+CLR 00 					; L506
+CLR 00 					; L508
+CLR 00 					; L510
+CLR 00 					; L512
+CLR 00 					; L514
+CLR 00 					; L516
+CLR 00 					; L518
+CLR 00 					; L520
+CLR 00 					; L522
+CLR 00 					; L524
+CLR 00 					; L526
+CLR 00 					; L528
+CLR 00 					; L530
+CLR 00 					; L532
+CLR 00 					; L534
+CLR 00 					; L536
+CLR 00 					; L538
+CLR 00 					; L540
+CLR 00 					; L542
+CLR 00 					; L544
+CLR 00 					; L546
+CLR 00 					; L548
+CLR 00 					; L550
