@@ -179,6 +179,7 @@ class GUI(object):
         for element in self.memstore:
             self.memstore.remove(element.iter)
         i = 500
+        emptylines = 3
         while True:
             opcode = self.pc.cpu.mem.get(i)
             line = i
@@ -188,7 +189,10 @@ class GUI(object):
             as_hex = opcode.hex
             self.memstore.append([line, as_bin, as_int, as_uint, as_hex])
             if opcode == self.pc.cpu.END:
-                break
+                if emptylines > 0:
+                    emptylines -= 1
+                else:
+                    break
             i += 2
 
     # event handlers
