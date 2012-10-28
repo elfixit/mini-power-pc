@@ -87,26 +87,26 @@ class SLL(BaseOperation):
     opcodeprefix = Bits('0b00001100')
 
     def do(self, op):
-        self.pc.accu.curry = self.pc.accu.val[0]
-        self.pc.accu.val = self.pc.accu.val << 1
+        self.pc.cpu.accu.curry = self.pc.cpu.accu.val[0]
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val << 1
 
 class AND(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0000'), Bits('0b100'))
 
     def do(self, op):
-        self.pc.accu.val = self.pc.accu.val & self.register.val
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val & self.register.val
 
 class OR(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0000'), Bits('0b110'))
 
     def do(self, op):
-        self.pc.accu.val = self.pc.accu.val | self.register.val
+        self.pc.cpu.accu.val = self.pc.cpu.accu.val | self.register.val
 
 class NOT(BaseOperation):
     opcodeprefix = Bits('0b000000001')
 
     def do(self, op):
-        self.pc.accu.val = ~self.pc.accu.val
+        self.pc.cpu.accu.val = ~self.pc.cpu.accu.val
 
 class BZ(RegisterBaseOperation):
     opcodeprefix = (Bits('0b0001'), Bits('0b10'))
@@ -143,7 +143,7 @@ class BZD(NumBaseOperation):
     def do(self, op):
        if self.pc.cpu.accu.val.int == 0:
            start = len(op) - self.num_length
-           num = getattr(op, self.num_format, 0)
+           num = getattr(op[start:len(op)], self.num_format, 0)
            self.pc.cpu.mem.jump(num)
 
 class BNZD(NumBaseOperation):
