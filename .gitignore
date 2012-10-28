@@ -1,6 +1,8 @@
 *.py[co]
 *.py
 .gitignore
+.mippc
+.swp
 
 # Packages
 *.egg

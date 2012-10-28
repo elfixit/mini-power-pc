@@ -122,6 +122,7 @@ BD 360 					; L340 else jump to Q-1=1
 CLR 00					; L342
 CLR	00					; L344
 CLR 00 					; L346
+CLR 00 					; L348
 CLR 00 					; L350 START Q-1=0
 SWDD 00 508 		; L352 R00(0) -> Q-1
 LWDD 11 508			; L354 Q-1 -> R11
@@ -131,8 +132,7 @@ CLR 00 					; L360 START Q-1=1
 INC		 					; L362 R00++		
 SWDD 00 508 		; L364 R00(1) -> Q-1
 LWDD 11 508 		; L366 Q-1 -> R11
-BD 380 					; L348 jump to count
-CLR 00 					; L368
+BD 380 					; L368 jump to count
 CLR 00 					; L370
 CLR 00 					; L372
 CLR 00 					; L374
