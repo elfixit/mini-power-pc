@@ -123,7 +123,7 @@ class Compiler(object):
                         raise Exception("Invalid opcode compiling.. {}")
                 opcode_all.append(opcode)
             else:
-                opcode_all.append(Bits(bin='1'+Bits(15).bin))
+                opcode_all.append(Bits(16))
         opcode_final = BitArray(600*8)
         opcode_final[0:len(opcode_all)] = opcode_all
         return opcode_final
