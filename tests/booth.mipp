@@ -7,21 +7,21 @@ CLR 00 ; #504 Q16 	more significant 16 bit
 CLR 00 ; #506 Q		less significant 16 bit
 CLR 00 ; 	internal vars:
 CLR 00 ; #508 Q-1
-CLR 00 ; #510 counter 
-CLR 00 ; 
+CLR 00 ; #510 counter
+CLR 00 ;
 CLR 00 ;	methods:
-CLR 00 ; #160 start 
+CLR 00 ; #160 start
 CLR 00 ;
 CLR 00 ; #200 compare(Q,Q-1) [Shift, Q0=1, Q16+M, Q16-M]
 CLR 00 ; #224 Q0=1(Q-1) [Q16-M, Shift]
 CLR 00 ; #240 Q16-M(Q16, M) [Shift]
 CLR 00 ; #270 Q16+M(Q16, M) [Shift]
-CLR 00 ;	
+CLR 00 ;
 CLR 00 ; #290 Shift(Q,Q-1,Q16) [ShiftOneToQ, Q-1==0, Q-1==0, count]
 CLR 00 ; #326 ShiftOneToQ
 CLR 00 ; #350 Q-1==0(Q-1) [count]
 CLR 00 ; #360 Q-1==1(Q-1) [count]
-CLR 00 ; 
+CLR 00 ;
 CLR 00 ; #380	count(counter) [END,compare]
 CLR 00 					; L150
 CLR 00 					; L152
@@ -70,7 +70,7 @@ CLR 00 					; L236
 CLR 00 					; L238
 CLR 00 					; L240 Start Q16-M
 ADD 01					; L242 Q16 -> R00
-NOT		 					; L244 
+NOT		 					; L244
 INC		 					; L246 Q16 * -1
 CLR 10					; L248
 LWDD 10 502 		; L250 Load M to R10
@@ -85,7 +85,7 @@ CLR 00 					; L266
 CLR 00 					; L268
 CLR 00 					; L270 START Q16+M
 ADD 01 					; L272 Q16 -> R00
-CLR 10					; L274 
+CLR 10					; L274
 LWDD 10 502 		; L276 Load M to R10
 ADD 10					; L278 Q16 + M = RES
 SWDD 00 504			; L280 R00(RES) -> Q16
@@ -105,14 +105,14 @@ CLR 00 					; L306
 ADD 10 					; L308 R10(Q) -> R00
 SRL		 					; L310
 SWDD 00 506			; L312 R00 -> Q
-BCD	360					; L314 if C==1 jump to Q-1=1 
+BCD	360					; L314 if C==1 jump to Q-1=1
 BD 350 					; L316 else jump to Q-1=0
 CLR 00 					; L318
 CLR 00 					; L320
 CLR 00 					; L322
-CLR 00 					; L324 
+CLR 00 					; L324
 CLR 00 					; L326 START ShiftOneToQ
-ADD 10					; L328 R10(Q) -> R00         
+ADD 10					; L328 R10(Q) -> R00
 NOT 						; L330
 SRL							; L332
 NOT							; L334
@@ -129,7 +129,7 @@ LWDD 11 508			; L354 Q-1 -> R11
 BD 380 					; L356 jump to count
 CLR 00 					; L358
 CLR 00 					; L360 START Q-1=1
-INC		 					; L362 R00++		
+INC		 					; L362 R00++
 SWDD 00 508 		; L364 R00(1) -> Q-1
 LWDD 11 508 		; L366 Q-1 -> R11
 BD 380 					; L368 jump to count
@@ -197,30 +197,4 @@ CLR 00 					; L490
 CLR 00 					; L492
 CLR 00 					; L494
 CLR 00 					; L496
-CLR 00 					; L498
-CLR 00					; L500
-CLR 00 					; L502
-CLR 00 					; L504
-CLR 00 					; L506
-CLR 00 					; L508
-CLR 00 					; L510
-CLR 00 					; L512
-CLR 00 					; L514
-CLR 00 					; L516
-CLR 00 					; L518
-CLR 00 					; L520
-CLR 00 					; L522
-CLR 00 					; L524
-CLR 00 					; L526
-CLR 00 					; L528
-CLR 00 					; L530
-CLR 00 					; L532
-CLR 00 					; L534
-CLR 00 					; L536
-CLR 00 					; L538
-CLR 00 					; L540
-CLR 00 					; L542
-CLR 00 					; L544
-CLR 00 					; L546
-CLR 00 					; L548
-CLR 00 					; L550
+
